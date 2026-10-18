@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum PlanId {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  TRIALING
+}
+
+enum PaymentStatus {
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PENDING
+}
+
+enum WalkStatus {
+  RUNNING
+  PAUSED
+  COMPLETED
+  STOPPED
+  FAILED
+}
+
+model User {
+  id             String         @id @default(cuid())
+  email          String         @unique
+  name           String
+  role           Role           @default(USER)
+  status         UserStatus     @default(ACTIVE)
+  planId         PlanId         @default(FREE)
+  country        String?
+  createdAt      DateTime       @default(now())
+  lastActiveAt   DateTime       @default(now())
+  walks          Walk[]
+  subscription   Subscription?
+  payments       Payment[]
+  activities     UserActivity[]
+}
+
+model Plan {
+  id            String   @id @default(cuid())
+  code          PlanId   @unique
+  name          String
+  price         Int
+  description   String
+  linksPerWalk  Int
+  walksPerDay   Int
+  walksPerMonth Int
+  historyDays   Int
+  maxSpeed      Int
+  exportEnabled Boolean  @default(false)
+  apiEnabled    Boolean  @default(false)
+  archived      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Subscription {
+  id        String             @id @default(cuid())
+  userId    String             @unique
+  user      User               @relation(fields: [userId], references: [id])
+  planId    PlanId
+  status    SubscriptionStatus @default(ACTIVE)
+  startedAt DateTime           @default(now())
+  expiresAt DateTime
+  amount    Int
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model Payment {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  planId    PlanId
+  amount    Int
+  status    PaymentStatus
+  stripeId  String?
+  createdAt DateTime      @default(now())
+}
+
+model Walk {
+  id            String     @id @default(cuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id])
+  urls          String[]
+  status        WalkStatus @default(COMPLETED)
+  startedAt     DateTime   @default(now())
+  finishedAt    DateTime?
+  currentIndex  Int        @default(0)
+  speed         Int        @default(1)
+  avgDurationMs Int        @default(0)
+  successCount  Int        @default(0)
+  errorCount    Int        @default(0)
+  createdAt     DateTime   @default(now())
+}
+
+model UserActivity {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  meta      String?
+  createdAt DateTime @default(now())
+}
+
+model PromoCode {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  discountPercent Int
+  maxUses         Int
+  used            Int      @default(0)
+  active          Boolean  @default(true)
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+}
+
+model AppSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
