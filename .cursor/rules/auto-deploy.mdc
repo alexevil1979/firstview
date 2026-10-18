@@ -1,0 +1,27 @@
+---
+description: После любых правок кода всегда коммитить в GitHub и деплоить на VPS
+alwaysApply: true
+---
+
+# Auto deploy: Git + VPS
+
+После завершения правок в этом проекте **всегда сам**:
+
+1. `git add` релевантных файлов (без секретов: `.env`, `.env.deploy`, пароли)
+2. Создать commit и `git push origin main` в `https://github.com/alexevil1979/firstview`
+3. Синхронизировать VPS: запустить `python deploy/run_sync.py` (или эквивалент)
+
+## VPS
+
+- Host: `192.168.1.152`
+- Path: `/ssd/www/firstview`
+- User: `root`
+- Credentials: читать из локального `.env.deploy` (не коммитить)
+- Service: `systemctl restart firstview`
+- Domain: `https://www.firstview.1tlt.ru`
+
+## Не делать
+
+- Не трогать локальный Linux / WSL
+- Не спрашивать подтверждение на push/deploy для обычных правок кода
+- Не коммитить пароли и `.env.deploy`
