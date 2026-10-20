@@ -12,6 +12,7 @@ import {
   Settings,
   ArrowLeft,
   LogOut,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -23,6 +24,7 @@ const links = [
   { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/subscriptions", label: "Подписки и тарифы", icon: CreditCard },
   { href: "/admin/payments", label: "Платежи", icon: Wallet },
+  { href: "/admin/payment-systems", label: "Платежные системы", icon: Building2 },
   { href: "/admin/analytics", label: "Аналитика", icon: BarChart3 },
   { href: "/admin/settings", label: "Настройки", icon: Settings },
 ];
